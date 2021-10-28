@@ -16,8 +16,8 @@ class TransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            'recipient_id' => random_int(1, 1000),
-            'payee_id' => random_int(1, 1000),
+            'recipient_id' => random_int(1, 10),
+            'payee_id' => random_int(1, 10),
             'currency_id' => random_int(1, 3),
             'amount' => random_int(1, 1000)
         ];
