@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use App\Models\User;
 use App\Services\Account\CheckAccountBalanceService;
+use Illuminate\Http\Request;
 
 class TestController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $account = User::find(1)->account;
+        $user= User::find($request->u);
+        $currency = Currency::find($request->c);
 
-        $service = new CheckAccountBalanceService($account);
+        $service = new CheckAccountBalanceService($user->account, $currency);
 
-        dd($service->getBalance());
+        dd($service->getBalance()->getCurrency()->getTicker());
     }
 }
