@@ -3,12 +3,11 @@
 namespace App\Services\Account;
 
 use DB;
-use Decimal\Decimal;
-use Exception;
-use App\Entities\Funds;
 use App\Models\Account;
 use App\Models\Currency;
 use Illuminate\Database\Query\Builder;
+use App\Exceptions\Account\Balance\InvalidBalanceException;
+
 
 final class CheckAccountBalanceService
 {
@@ -44,17 +43,17 @@ final class CheckAccountBalanceService
     }
 
     /**
-     * @return Funds
-     * @throws Exception
+     * @return float
+     * @throws InvalidBalanceException
      */
-    public function getBalance(): Funds
+    public function getBalance(): float
     {
         $result = $this->transactionQuery->first();
 
         if (is_numeric($result->income) && is_numeric($result->outcome)) {
-            return new Funds($this->currency, bcsub($result->income, $result->outcome));
+            return bcsub($result->income, $result->outcome);
         }
 
-        throw new Exception('fail');
+        throw new InvalidBalanceException('Invalid balance!');
     }
 }

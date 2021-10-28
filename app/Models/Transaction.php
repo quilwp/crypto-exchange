@@ -17,6 +17,16 @@ class Transaction extends Model
     use HasFactory;
 
     /**
+     * @var string[]
+     */
+    protected $fillable = [
+        'recipient_id',
+        'payee_id',
+        'currency_id',
+        'amount'
+    ];
+
+    /**
      * @return BelongsTo
      */
     public function recipient(): BelongsTo

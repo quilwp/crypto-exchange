@@ -2,7 +2,7 @@
 
 namespace App\Entities;
 
-use Exception;
+use App\Exceptions\Entity\Funds\InvalidAmountException;
 
 final class Funds
 {
@@ -17,14 +17,14 @@ final class Funds
     private float $amount;
 
     /**
-     * @param \App\Models\Currency  $currency
+     * @param \App\Models\Currency $currency
      * @param float $amount
-     * @throws Exception
+     * @throws InvalidAmountException
      */
     public function __construct(\App\Models\Currency $currency, float $amount)
     {
-        if ($amount < 0) {
-            throw new Exception("Negative amount is not possible [$amount]");
+        if ($amount <= 0) {
+            throw new InvalidAmountException("Negative and zero amount is not possible!");
         }
 
         $this->currency = new Currency($currency);
