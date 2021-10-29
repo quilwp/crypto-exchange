@@ -19,15 +19,15 @@ final class CreateTransactionService
     private Funds $funds;
 
     /**
+     * @param Account $sender
      * @param Account $recipient
-     * @param Account $payee
      * @param Currency $currency
      * @param float $amount
      * @throws InvalidAmountException
      */
     public function __construct(
+        private Account $sender,
         private Account $recipient,
-        private Account $payee,
         private Currency $currency,
         float $amount
     ){
@@ -41,12 +41,12 @@ final class CreateTransactionService
      */
     public function commit(): void
     {
-        $balance = (new CheckAccountBalanceService($this->recipient, $this->currency))->getBalance();
+        $balance = (new CheckAccountBalanceService($this->sender, $this->currency))->getBalance();
 
         if ($this->funds->getAmount() <= $balance) {
             Transaction::create([
+                'sender_id' => $this->sender->id,
                 'recipient_id' => $this->recipient->id,
-                'payee_id' => $this->payee->id,
                 'currency_id' => $this->currency->id,
                 'amount' => $this->funds->getAmount(),
             ]);
