@@ -6,6 +6,7 @@ use App\Traits\Models\Uuidable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder;
 
 /**
  * @property-read int $sender_id
@@ -21,8 +22,8 @@ class Transaction extends Model
      * @var string[]
      */
     protected $fillable = [
+        'sender_id',
         'recipient_id',
-        'payee_id',
         'currency_id',
         'amount'
     ];
@@ -32,7 +33,7 @@ class Transaction extends Model
      */
     public function sender(): BelongsTo
     {
-        return $this->belongsTo(Account::class, 'payee_id');
+        return $this->belongsTo(Account::class, 'sender_id');
     }
 
     /**
@@ -52,11 +53,11 @@ class Transaction extends Model
     }
 
     /**
-     * @param $query
+     * @param Builder $query
      * @param Currency $currency
-     * @return mixed
+     * @return Builder
      */
-    public function scopeBelongsToCurrency($query, Currency $currency)
+    public function scopeBelongsToCurrency(Builder $query, Currency $currency): Builder
     {
         return $query->where('currency_id', $currency->id);
     }
