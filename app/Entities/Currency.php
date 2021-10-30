@@ -5,29 +5,16 @@ namespace App\Entities;
 final class Currency
 {
     /**
-     * @var int
+     * @param int $id
+     * @param string $name
+     * @param string $ticker
      */
-    private int $id;
-
-    /**
-     * @var string
-     */
-    private string $name;
-
-    /**
-     * @var string
-     */
-    private string $ticker;
-
-    /**
-     * @param \App\Models\Currency $currency
-     */
-    public function __construct(\App\Models\Currency $currency)
-    {
-        $this->id = $currency->id;
-        $this->name = $currency->name;
-        $this->ticker = $currency->ticker;
-    }
+    public function __construct(
+        private int $id,
+        private string $name,
+        private string $ticker
+    )
+    {}
 
     /**
      * @return int

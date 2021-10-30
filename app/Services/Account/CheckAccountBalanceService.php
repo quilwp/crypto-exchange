@@ -3,8 +3,8 @@
 namespace App\Services\Account;
 
 use DB;
-use App\Models\Account;
-use App\Models\Currency;
+use App\Entities\Account;
+use App\Entities\Currency;
 use Illuminate\Database\Query\Builder;
 use App\Exceptions\Account\Balance\InvalidBalanceException;
 
@@ -33,13 +33,14 @@ final class CheckAccountBalanceService
     private function createTransactionQuery(): Builder
     {
         return DB::table('transactions')
-            ->selectRaw('sum(case when payee_id = ? then amount else 0 end) as income', [$this->account->id])
-            ->selectRaw('sum(case when recipient_id = ? then amount else 0 end) as outcome', [$this->account->id])
+            ->selectRaw('coalesce(sum(case when recipient_id = ? then amount else 0 end), 0) as income', [$this->account->getId()])
+            ->selectRaw('coalesce(sum(case when sender_id = ? then amount else 0 end), 0) as outcome', [$this->account->getId()])
+            ->selectRaw('count(1) as count')
             ->where(function ($query) {
-                $query->where('payee_id', $this->account->id);
-                $query->orWhere('recipient_id', $this->account->id);
+                $query->where('sender_id', $this->account->getId());
+                $query->orWhere('recipient_id', $this->account->getId());
             })
-            ->where('currency_id', $this->currency->id);
+            ->where('currency_id', $this->currency->getId());
     }
 
     /**

@@ -2,38 +2,25 @@
 
 namespace App\Services\Transaction;
 
+use App\Entities\Account;
 use App\Entities\Funds;
-use App\Models\Account;
-use App\Models\Currency;
 use App\Models\Transaction;
 use App\Services\Account\CheckAccountBalanceService;
 use App\Exceptions\Transaction\AccountBalanceException;
-use App\Exceptions\Entity\Funds\InvalidAmountException;
 use App\Exceptions\Account\Balance\InvalidBalanceException;
 
 final class CreateTransactionService
 {
     /**
-     * @var Funds
-     */
-    private Funds $funds;
-
-    /**
+     * @param Account $sender
      * @param Account $recipient
-     * @param Account $payee
-     * @param Currency $currency
-     * @param float $amount
-     * @throws InvalidAmountException
+     * @param Funds $funds
      */
     public function __construct(
+        private Account $sender,
         private Account $recipient,
-        private Account $payee,
-        private Currency $currency,
-        float $amount
-    ){
-
-        $this->funds = new Funds($currency, $amount);
-    }
+        private Funds $funds
+    ){}
 
     /**
      * @throws AccountBalanceException
@@ -41,13 +28,13 @@ final class CreateTransactionService
      */
     public function commit(): void
     {
-        $balance = (new CheckAccountBalanceService($this->recipient, $this->currency))->getBalance();
+        $balance = (new CheckAccountBalanceService($this->sender, $this->funds->getCurrency()))->getBalance();
 
         if ($this->funds->getAmount() <= $balance) {
             Transaction::create([
-                'recipient_id' => $this->recipient->id,
-                'payee_id' => $this->payee->id,
-                'currency_id' => $this->currency->id,
+                'sender_id' => $this->sender->getId(),
+                'recipient_id' => $this->recipient->getId(),
+                'currency_id' => $this->funds->getCurrency()->getId(),
                 'amount' => $this->funds->getAmount(),
             ]);
         } else {

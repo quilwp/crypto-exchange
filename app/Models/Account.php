@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Entities\Account as AccountEntity;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,8 +36,8 @@ class Account extends Model
     public function transactions(): HasMany
     {
         //TODO: create custom relation. This case won`t work with eager loading :(
-        return $this->hasMany(Transaction::class, 'recipient_id')
-                    ->orWhere('payee_id', $this->user_id);
+        return $this->hasMany(Transaction::class, 'sender_id')
+                    ->orWhere('recipient_id', $this->user_id);
     }
 
     /**
@@ -45,5 +46,13 @@ class Account extends Model
     public function getIdAttribute(): int
     {
         return $this->attributes['user_id'];
+    }
+
+    /**
+     * @return AccountEntity
+     */
+    public function toEntity(): AccountEntity
+    {
+        return new AccountEntity($this->id);
     }
 }
